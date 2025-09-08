@@ -1,7 +1,5 @@
 # CTFkom 03.09.2025 - Writeup Asymmetric JWT
 
----
-
 # Objective and scope
 
 ---
