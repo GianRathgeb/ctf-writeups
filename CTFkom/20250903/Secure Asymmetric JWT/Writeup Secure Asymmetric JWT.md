@@ -1,4 +1,4 @@
-# CTFkom 03.09.2025 - Writeup Asymmetric JWT
+# CTFkom 03.09.2025 - Writeup Secure Asymmetric JWT
 
 # Objective and scope
 
