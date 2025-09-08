@@ -2,19 +2,13 @@
 
 # Objective and scope
 
----
-
 The target application at `http://129.241.150.108:30005` uses a `jwt` cookie for session handling. The objective was to assess and exploit the session handling in order to forge an administrative token and reach the protected endpoint `/flag/`.
 
 # How do Key Confusion Attacks Work
 
----
-
 JSON Web Tokens encode a header, a payload, and a signature. RS256 uses an RSA private key for signing and an RSA public key for verification. HS256 uses an HMAC secret for both signing and verification. If a verifier accepts the token’s `alg` header and reuses RSA public-key material as an HMAC secret, an attacker who knows the public key can sign HS256 tokens that the server will accept as authentic. This is then called a key confusion attack. The key questions are whether the public key can be recovered, and which exact byte representation the verifier treats as the HMAC secret, because flawed implementations vary between SubjectPublicKeyInfo, PKCS#1, DER bytes, or even literal PEM text.
 
 # Collected material
-
----
 
 An RS256 JWT was observed in traffic and used as input for public-key recovery:
 
@@ -49,8 +43,6 @@ eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxMjMiLCJhZG1pbiI6ZmF
 
 # Public-key recovery and initial acceptance test
 
----
-
 Since the public key is not hosted publicly (or at least it’s hidden very well), we need to reconstruct the public key. PortSwigger’s `sig2n` was used to reconstruct the RSA public key and emit candidate HS256 tokens. This is the only helper command that was required:
 
 ```bash
@@ -79,13 +71,9 @@ The script found two different multipliers, so I just tried all the tokens (Tamp
 
 # Determining the Exact Secret Bytes
 
----
-
 The sig2n line labeled “Base64 encoded pkcs1 key” for multiplier 2 is the base64 of the RSA PUBLIC KEY PEM text. Decoding it yields the full `-----BEGIN RSA PUBLIC KEY-----` block with header, footer, and line breaks. The verifier treated those literal PEM bytes as the HMAC secret, not DER, not SPKI, and not x509.
 
 # Burp Suite Exploitation Using JWT Editor
-
----
 
 This attack can be performed entirely in Burp by registering the correct symmetric key and letting the extension re-sign the token. We need the JWT Editor extension in burp to perform this attack.
 
@@ -107,8 +95,6 @@ In Burp Suite, the attack can now be done. Here are the exact steps to forge a t
 The endpoint shows a 200 status code and shows the flag. The full request and response is shown in the next chapter.
 
 # Access to the Protected Resource and Flag
-
----
 
 With the forged token set in the `jwt` cookie, `/flag/` returned HTTP 200 and the flag was present in the response. Here is the request that was being used request:
 
@@ -137,8 +123,6 @@ CTFkom{ddaf66f1b50d425e7d68ad930ae563a}
 ```
 
 # Conclusion
-
----
 
 The verifier accepted the token’s `alg` header and reused RSA public-key material as an HMAC secret. The exact secret matched the decoded PKCS#1 RSA PUBLIC KEY PEM text bytes from `sig2n` multiplier 2. Constructing and signing an HS256 token with `admin: true` and a valid expiry in Burp’s JWT Editor yielded HTTP 200 on `/flag/`.
 
